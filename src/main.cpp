@@ -36,7 +36,7 @@ int main() {
   uWS::Hub h;
 
   // DATA LOGGING
-  const char *path1 = "/home/workspace/CarND-PID-Control-Project/output_files/datalog_1"; 
+  const char *path1 = "/home/workspace/CarND-PID-Control-Project/output_files/datalog_1.txt"; 
   ofstream outfile(path1);    
   outfile.close();
 
