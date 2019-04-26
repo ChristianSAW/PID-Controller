@@ -5,6 +5,7 @@
 #include "json.hpp"
 #include "PID.h"
 #include "filter.hpp"
+#include "helper.h"
 
 // for convenience
 using nlohmann::json;
@@ -34,20 +35,25 @@ string hasData(string s) {
 int main() {
   uWS::Hub h;
 
+  // DATA LOGGING
+  const char *path1 = "/home/workspace/CarND-PID-Control-Project/output_files/datalog_1"; 
+  ofstream outfile(path1);    
+  outfile.close();
+
   PID pid;
   filter filter_steer;
   /**
    * TODO: Initialize the pid variable.
    */
   double init_Kp = 0.2;
-  double init_Kd = 4.3;
-  double init_Ki = 0.002;
+  double init_Kd = 4.0;
+  double init_Ki = 0.0004;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
   double alpha = 0.75;
   fiter_steer.Init(alpha);
 
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  h.onMessage([&pid, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
