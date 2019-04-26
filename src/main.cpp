@@ -83,7 +83,7 @@ int main() {
 
           // data logging 
           #if(true)
-            if ((timeSTP+1)%10 == 0) {
+            if ((pid.get_stp()+0)%10 == 0) {
               data1 = {speed, throttle, steer_value, angle, cte};
               std::ofstream outfile;
               outfile.open(path1,std::ios_base::app);  

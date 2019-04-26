@@ -43,3 +43,7 @@ double PID::update_steer(double cte) {
   UpdateError(cte);
   return TotalError();
 }
+
+double PID::get_stp() {
+  return stp;
+}

@@ -38,6 +38,12 @@ class PID {
   double update_steer(double cte);
 
 
+  /**
+   * Returns the current step (counter)
+   */
+  double get_stp();
+
+
  private:
   /**
    * PID Errors
