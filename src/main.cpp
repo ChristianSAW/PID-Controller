@@ -50,7 +50,7 @@ int main() {
   double init_Ki = 0.0004;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
-  double alpha = 0.75;
+  double alpha = 0.99;
   filter_steer.Init(alpha);
 
   h.onMessage([&pid, &filter_steer, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
@@ -83,7 +83,7 @@ int main() {
 
           // data logging 
           #if(true)
-            if ((pid.get_stp()+0)%10 == 0) {
+            if ((pid.get_stp()+0)%2 == 0) {
               data1 = {speed, throttle, steer_value, angle, cte};
               std::ofstream outfile;
               outfile.open(path1,std::ios_base::app);  
@@ -98,7 +98,8 @@ int main() {
           steer_value = filter_steer.smooth(steer_value);       // smooth out changes
 
           // throttle update
-          //throttle = 0.4;
+          throttle = 0.4;
+          #if(false)
           if (speed > 30) {                 // speed > 30
             throttle = 0.4;
           } else {                          // speed < 30
@@ -107,7 +108,7 @@ int main() {
           if (speed > 22 and fabs(cte) > 0.2) {
             throttle = -0.2;                   //break 
           }
-
+          #endif
           // Keep Steering Value Within Bounds
           if (steer_value < -1) {
             steer_value = -1;
