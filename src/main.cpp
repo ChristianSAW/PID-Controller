@@ -4,7 +4,7 @@
 #include <string>
 #include "json.hpp"
 #include "PID.h"
-#include "filter.hpp"
+#include "filter.h"
 #include "helper.h"
 
 // for convenience
@@ -73,12 +73,25 @@ int main() {
           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
           double throttle;
+          vector<double> data1;
           /**
            * TODO: Calculate steering value here, remember the steering value is
            *   [-1, 1].
            * NOTE: Feel free to play around with the throttle and speed.
            *   Maybe use another PID controller to control the speed!
            */
+
+          // data logging 
+          #if(true)
+            if ((timeSTP+1)%10 == 0) {
+              data1 = {speed, throttle, steer_value, angle, cte};
+              std::ofstream outfile;
+              outfile.open(path1,std::ios_base::app);  
+              helper.updateTextFile(outfile, data1);
+              outfile.close();
+            }
+          #endif
+
 
           // calculate steering
           steer_value = pid.update_steer(cte);
