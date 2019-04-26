@@ -4,6 +4,7 @@
 #include <string>
 #include "json.hpp"
 #include "PID.h"
+#include "filter.hpp"
 
 // for convenience
 using nlohmann::json;
