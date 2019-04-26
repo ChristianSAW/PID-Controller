@@ -35,14 +35,17 @@ int main() {
   uWS::Hub h;
 
   PID pid;
+  filter filter_steer;
   /**
    * TODO: Initialize the pid variable.
    */
   double init_Kp = 0.2;
   double init_Kd = 4.3;
   double init_Ki = 0.002;
-
   pid.Init(init_Kp,init_Ki,init_Kd);
+
+  double alpha = 0.75;
+  fiter_steer.Init(alpha);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
@@ -73,6 +76,7 @@ int main() {
 
           // calculate steering
           steer_value = pid.update_steer(cte);
+          steer_value = filter_steer.smooth(steer_value);       // smooth out changes
 
           // throttle update
           //throttle = 0.4;
