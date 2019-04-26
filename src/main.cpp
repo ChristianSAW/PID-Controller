@@ -37,9 +37,9 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  double init_Kp = 0.1;
-  double init_Kd = 3.0;
-  double init_Ki = 0.004;
+  double init_Kp = 0.2;
+  double init_Kd = 4.3;
+  double init_Ki = 0.002;
 
   pid.Init(init_Kp,init_Ki,init_Kd);
 
@@ -74,12 +74,19 @@ int main() {
           steer_value = pid.update_steer(cte);
 
           // throttle update
-          if (speed > 30) {throttle = 0.3;}  // speed > 30
-          else {speed = 0.35;}               // speed < 30
+          //throttle = 0.4;
+          if (speed > 30) {                 // speed > 30
+            throttle = 0.4;
+          } else {                          // speed < 30
+            throttle = 0.45;
+          }               
+          if (speed > 22 and fabs(cte) > 0.2) {
+            throttle = -0.2;                   //break 
+          }
 
           // Keep Steering Value Within Bounds
           if (steer_value < -1) {
-            steer_value = 1;
+            steer_value = -1;
           } else if (steer_value > 1) {
             steer_value = 1;
           }
