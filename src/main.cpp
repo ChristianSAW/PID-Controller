@@ -74,8 +74,8 @@ int main() {
           steer_value = pid.update_steer(cte);
 
           // throttle update
-          if (speed > 30) {throttle = 0.3}  // speed > 30
-          else {speed = 0.35}               // speed < 30
+          if (speed > 30) {throttle = 0.3;}  // speed > 30
+          else {speed = 0.35;}               // speed < 30
 
           // Keep Steering Value Within Bounds
           if (steer_value < -1) {

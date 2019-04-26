@@ -59,7 +59,6 @@ class PID {
    * Parameter Optimization 
    */ 
   double stp = 0; // counter 
-  double d
 
 };
 
