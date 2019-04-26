@@ -4,6 +4,8 @@
 #include <string>
 #include "json.hpp"
 #include "PID.h"
+#include "filter.h"
+#include "helper.h"
 
 // for convenience
 using nlohmann::json;
@@ -33,17 +35,25 @@ string hasData(string s) {
 int main() {
   uWS::Hub h;
 
+  // DATA LOGGING
+  const char *path1 = "/home/workspace/CarND-PID-Control-Project/output_files/datalog_1"; 
+  ofstream outfile(path1);    
+  outfile.close();
+
   PID pid;
+  filter filter_steer;
   /**
    * TODO: Initialize the pid variable.
    */
   double init_Kp = 0.2;
-  double init_Kd = 4.3;
-  double init_Ki = 0.002;
-
+  double init_Kd = 4.0;
+  double init_Ki = 0.0004;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  double alpha = 0.75;
+  fiter_steer.Init(alpha);
+
+  h.onMessage([&pid, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -63,6 +73,7 @@ int main() {
           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
           double throttle;
+          vector<double> data1;
           /**
            * TODO: Calculate steering value here, remember the steering value is
            *   [-1, 1].
@@ -70,8 +81,21 @@ int main() {
            *   Maybe use another PID controller to control the speed!
            */
 
+          // data logging 
+          #if(true)
+            if ((pid.get_stp()+0)%10 == 0) {
+              data1 = {speed, throttle, steer_value, angle, cte};
+              std::ofstream outfile;
+              outfile.open(path1,std::ios_base::app);  
+              helper.updateTextFile(outfile, data1);
+              outfile.close();
+            }
+          #endif
+
+
           // calculate steering
           steer_value = pid.update_steer(cte);
+          steer_value = filter_steer.smooth(steer_value);       // smooth out changes
 
           // throttle update
           //throttle = 0.4;
