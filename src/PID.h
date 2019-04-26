@@ -41,7 +41,7 @@ class PID {
   /**
    * Returns the current step (counter)
    */
-  double get_stp();
+  int get_stp();
 
 
  private:
@@ -64,7 +64,7 @@ class PID {
   /**
    * Parameter Optimization 
    */ 
-  double stp = 0; // counter 
+  int stp = 0; // counter 
 
 };
 

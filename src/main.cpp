@@ -51,9 +51,9 @@ int main() {
   pid.Init(init_Kp,init_Ki,init_Kd);
 
   double alpha = 0.75;
-  fiter_steer.Init(alpha);
+  filter_steer.Init(alpha);
 
-  h.onMessage([&pid, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  h.onMessage([&pid, &filter_steer, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -87,7 +87,7 @@ int main() {
               data1 = {speed, throttle, steer_value, angle, cte};
               std::ofstream outfile;
               outfile.open(path1,std::ios_base::app);  
-              helper.updateTextFile(outfile, data1);
+              updateTextFile(outfile, data1);
               outfile.close();
             }
           #endif

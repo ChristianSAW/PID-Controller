@@ -24,5 +24,5 @@ void filter::savePrevious(double value) {
 
 
 double filter::smooth(double value) {
-	return alpha*value+(1-alpha)*prev_value;
+  return alpha*value+(1-alpha)*prev_value;
 }
