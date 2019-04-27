@@ -45,9 +45,9 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  double init_Kp = 0.2;
-  double init_Kd = 4.0;
-  double init_Ki = 0.0004;
+  double init_Kp = 0.225;
+  double init_Kd = 4.05;
+  double init_Ki = 0.0005;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
   double alpha = 0.99;
@@ -98,14 +98,14 @@ int main() {
           steer_value = filter_steer.smooth(steer_value);       // smooth out changes
 
           // throttle update
-          throttle = 0.4;
-          #if(false)
+          throttle = 0.3;
+          #if(true)
           if (speed > 30) {                 // speed > 30
-            throttle = 0.4;
+            throttle = 0.3;
           } else {                          // speed < 30
-            throttle = 0.45;
+            throttle = 0.35;
           }               
-          if (speed > 22 and fabs(cte) > 0.2) {
+          if (speed > 28 and fabs(cte) > 0.2 and fabs(steer_value) > 0.25) {
             throttle = -0.2;                   //break 
           }
           #endif
