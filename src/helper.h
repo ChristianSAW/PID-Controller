@@ -27,17 +27,4 @@ inline void updateTextFile(ofstream &outfile, vector<double> vals) {
     outfile.close();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif // end definition 
+#endif // end definition
