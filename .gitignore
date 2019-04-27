@@ -2,3 +2,5 @@
 build
 tags
 .editorconfig
+output_files/datalog_1_*
+output_files/run*
