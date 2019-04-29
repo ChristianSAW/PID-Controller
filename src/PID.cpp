@@ -17,7 +17,7 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   Kp = Kp_;
   Ki = Ki_;
   Kd = Kd_;
-  stp = 0; 
+  stp = 0;
 }
 
 void PID::UpdateError(double cte) {
@@ -28,7 +28,7 @@ void PID::UpdateError(double cte) {
   p_error = -cte*Kp;
   d_error = -(cte-prev_cte)*Kd;
   i_error = -sum_cte*Ki;
-  prev_cte = cte; 
+  prev_cte = cte;
 }
 
 double PID::TotalError() {
@@ -38,7 +38,7 @@ double PID::TotalError() {
   return p_error + d_error + i_error;  // TODO: Add your total error calc here!
 }
 
-double PID::update_steer(double cte) {
+double PID::update_val(double cte) {
   ++stp;
   UpdateError(cte);
   return TotalError();

@@ -36,11 +36,14 @@ int main() {
   uWS::Hub h;
 
   // DATA LOGGING
-  const char *path1 = "/home/workspace/CarND-PID-Control-Project/output_files/datalog_1.txt"; 
-  ofstream outfile(path1);    
+  const char *path1 = "/home/workspace/CarND-PID-Control-Project/output_files/datalog_1.txt";
+  ofstream outfile(path1);
   outfile.close();
 
   PID pid;
+  PID pid_t_speed;
+  PID pid_t_cte;
+  PID pid_t_steer;
   filter filter_steer;
   /**
    * TODO: Initialize the pid variable.
@@ -50,10 +53,25 @@ int main() {
   double init_Ki = 0.0005;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
+  double init_Kp_t1 = 0.2;
+  double init_Kd_t1 = 0.0; // try a negative value
+  double init_Ki_t1 = 0.0;
+  pid_t_speed.Init(init_Kp_t1,init_Ki_t1,init_Kd_t1);
+
+  double init_Kp_t2 = 2.0;
+  double init_Kd_t2 = 0.0; // try 2 or 20
+  double init_Ki_t2 = 0.0;
+  pid_t_cte.Init(init_Kp_t2,init_Ki_t2,init_Kd_t2);
+
+  double init_Kp_t3 = 2.0;
+  double init_Kd_t3 = 0.0; // try 4 or 40
+  double init_Ki_t3 = 0.0;
+  pid_t_steer.Init(init_Kp_t3,init_Ki_t3,init_Kd_t3);
+
   double alpha = 0.99;
   filter_steer.Init(alpha);
 
-  h.onMessage([&pid, &filter_steer, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  h.onMessage([&pid,&pid_t_cte,&pid_t_speed,&pid_t_steer, &filter_steer, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -73,6 +91,8 @@ int main() {
           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
           double throttle;
+          double desired_speed = 70;
+          double error_speed = desired_speed - speed;
           vector<double> data1;
           /**
            * TODO: Calculate steering value here, remember the steering value is
@@ -81,12 +101,12 @@ int main() {
            *   Maybe use another PID controller to control the speed!
            */
 
-          // data logging 
+          // data logging
           #if(true)
             if ((pid.get_stp()+0)%2 == 0) {
               data1 = {speed, throttle, steer_value, angle, cte};
               std::ofstream outfile;
-              outfile.open(path1,std::ios_base::app);  
+              outfile.open(path1,std::ios_base::app);
               updateTextFile(outfile, data1);
               outfile.close();
             }
@@ -94,30 +114,34 @@ int main() {
 
 
           // calculate steering
-          steer_value = pid.update_steer(cte);
+          steer_value = pid.update_val(cte);
           steer_value = filter_steer.smooth(steer_value);       // smooth out changes
 
           // throttle update
           throttle = 0.3;
-          #if(true)
+          #if(false)
           if (speed > 30) {                 // speed > 30
             throttle = 0.3;
           } else {                          // speed < 30
             throttle = 0.35;
-          }               
+          }
           if (speed > 28 and fabs(cte) > 0.2 and fabs(steer_value) > 0.25) {
-            throttle = -0.2;                   //break 
+            throttle = -0.2;                   //break
           }
           #endif
+
+          // calculate throttle
+          throttle = -pid.update_val(error_speed);
+
           // Keep Steering Value Within Bounds
           if (steer_value < -1) {
             steer_value = -1;
           } else if (steer_value > 1) {
             steer_value = 1;
           }
-          
+
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
+          std::cout << "CTE: " << cte << " Steering Value: " << steer_value
                     << std::endl;
 
           json msgJson;
@@ -139,7 +163,7 @@ int main() {
     std::cout << "Connected!!!" << std::endl;
   });
 
-  h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code, 
+  h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code,
                          char *message, size_t length) {
     ws.close();
     std::cout << "Disconnected" << std::endl;
@@ -152,6 +176,6 @@ int main() {
     std::cerr << "Failed to listen to port" << std::endl;
     return -1;
   }
-  
+
   h.run();
 }

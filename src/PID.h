@@ -30,12 +30,12 @@ class PID {
    * @output The total PID error
    */
   double TotalError();
-  
+
   /**
-   * Update the steering value given cross track error.
-   * @param cte The current cross track error
+   * Update the steering (or other) value given cross track (or other) error.
+   * @param cte The current cross track error (o)r other error)
    */
-  double update_steer(double cte);
+  double update_val(double cte);
 
 
   /**
@@ -56,15 +56,15 @@ class PID {
 
   /**
    * PID Coefficients
-   */ 
+   */
   double Kp;
   double Ki;
   double Kd;
- 
+
   /**
-   * Parameter Optimization 
-   */ 
-  int stp = 0; // counter 
+   * Parameter Optimization
+   */
+  int stp = 0; // counter
 
 };
 
