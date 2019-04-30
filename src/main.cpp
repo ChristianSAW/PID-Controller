@@ -76,8 +76,14 @@ int main() {
   double msp = 0;         // max speed
   filter_steer.Init(alpha);
 
-  h.onMessage([&pid,&pid_t_cte,&pid_t_speed,&pid_t_steer, &filter_steer, &msp, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
-                     uWS::OpCode opCode) {
+  // 3rd Approach to Controller
+  double c_time = 0.0; // Current frame time
+  double p_time = clock(); // Previous frame time
+  double t = 0.0; // Total time
+
+  h.onMessage([&pid,&pid_t_cte,&pid_t_speed,&pid_t_steer, &filter_steer, &msp,
+                     &c_time, &p_time, &t, path1](uWS::WebSocket<uWS::SERVER> ws,
+                     char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -101,6 +107,7 @@ int main() {
           double error_cte;
           double error_steering;
           vector<double> data1;
+
           /**
            * TODO: Calculate steering value here, remember the steering value is
            *   [-1, 1].
@@ -119,36 +126,58 @@ int main() {
             }
           #endif
 
-
           // calculate steering
-          steer_value = pid.update_val(cte);
-          steer_value = filter_steer.smooth(steer_value);       // smooth out changes
+          #if(false) // Approach #1 & #2
+            steer_value = pid.update_val(cte);
+            steer_value = filter_steer.smooth(steer_value);       // smooth out changes
+          #else // Approach #3
+            c_time = clock();
+            double dt = (c_time - p_time) / CLOCKS_PER_SEC;
+            steer_value = pid.update_steering_lin(cte, speed, dt);
+          #endif
 
-          // throttle update
-          throttle = 0.3;
-          #if(false)
-          if (speed > 30) {                 // speed > 30
-            throttle = 0.3;
-          } else {                          // speed < 30
-            throttle = 0.35;
-          }
-          if (speed > 28 and fabs(cte) > 0.2 and fabs(steer_value) > 0.25) {
-            throttle = -0.2;                   //break
-          }
+          // throttle update Simple PID
+          //throttle = 0.3;
+          #if(false) // Approach #1
+            if (speed > 30) {                 // speed > 30
+              throttle = 0.3;
+            } else {                          // speed < 30
+              throttle = 0.35;
+            }
+            if (speed > 28 and fabs(cte) > 0.2 and fabs(steer_value) > 0.25) {
+              throttle = -0.2;                //break
+            }
           #endif
 
           // Piecewise limits on error_cte & error_steering
-          double limBand1 = 0.00;
-          double limBand2 = 0.00;
-          if (fabs(cte) < limBand1) {error_cte = 0;}
-           else {error_cte = cte;}
-          if (fabs(steer_value) < limBand2) {error_steering = 0;}
-          else {error_steering = steer_value;}
+          #if(false)
+            double limBand1 = 0.00;
+            double limBand2 = 0.00;
+            if (fabs(cte) < limBand1) {error_cte = 0;}
+            else {error_cte = cte;}
+            if (fabs(steer_value) < limBand2) {error_steering = 0;}
+            else {error_steering = steer_value;}
+          #else
+            error_cte = cte;
+            error_steering = steer_value;
+          #endif
 
-          // calculate throttle
-          throttle = -pid_t_speed.update_val(error_speed)
-                     +pid_t_cte.update_val(error_cte)
-                     +pid_t_steer.update_val(fabs(error_steering));
+          // calculate throttle Complex PID
+          #if(false) // Approach #2
+            throttle = -pid_t_speed.update_val(error_speed)
+                      +pid_t_cte.update_val(error_cte)
+                      +pid_t_steer.update_val(fabs(error_steering));
+          #else // Approach #3
+            throttle = 0.8;
+            if (fabs(cte) > 0.5){
+		          thr = 0.5;
+		        }
+            if (fabs(pid.prev_cte - cte) > 0.1 and fabs(pid.prev_cte - cte) <= 0.2){
+              throttle = 0.0;
+		        } else if (fabs(pid.prev_cte - cte) > 0.2 and speed > 30){
+			        throttle = -0.2; // Break!
+            }
+          #endif
 
           // Keep Steering Value Within Bounds
           if (steer_value < -1) {

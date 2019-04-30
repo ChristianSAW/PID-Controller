@@ -43,8 +43,11 @@ class PID {
    */
   int get_stp();
 
+  /**
+   * Returns sliding window addition of err
+   */
+  double add_i(double err);
 
- private:
   /**
    * PID Errors
    */
@@ -54,12 +57,20 @@ class PID {
   double prev_cte;
   double sum_cte;
 
+
+ private:
   /**
    * PID Coefficients
    */
   double Kp;
   double Ki;
   double Kd;
+
+  /**
+   * Sliding Window Addition
+   */
+  int *window;
+  int i;
 
   /**
    * Parameter Optimization

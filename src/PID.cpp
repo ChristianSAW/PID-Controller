@@ -1,4 +1,5 @@
 #include "PID.h"
+#define WINDOW_SIZE 20
 
 /**
  * TODO: Complete the PID class. You may add any additional desired functions.
@@ -18,6 +19,10 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   Ki = Ki_;
   Kd = Kd_;
   stp = 0;
+
+  // For 3rd PID Approach (Use of Sliding Window for cte sum)
+  window = (int*) calloc( WINDOW_SIZE , sizeof(window[0]) ) ;
+  i = WINDOW_SIZE - 1 ;
 }
 
 void PID::UpdateError(double cte) {
@@ -28,6 +33,13 @@ void PID::UpdateError(double cte) {
   p_error = -cte*Kp;
   d_error = -(cte-prev_cte)*Kd;
   i_error = -sum_cte*Ki;
+  prev_cte = cte;
+}
+
+void PID::UpdateError2(double cte, double dt) {
+  p_error = -cte;
+  d_error = -(cte-prev_cte);
+  i_error = -add_i(cte * dt);
   prev_cte = cte;
 }
 
@@ -44,6 +56,23 @@ double PID::update_val(double cte) {
   return TotalError();
 }
 
+double PID::update_steering_lin(double cte, double speed, dt) {
+  double Kp_sp = 0.0032;
+  double Kd_sp = 0.0002;
+  ++stp;
+  UpdateError2(cte,dt);
+  return (Kp - Kp_sp*speed)*p_error + (Kd + Kd_sp*speed)*d_error + Ki*i_error
+}
+
 int PID::get_stp() {
   return stp;
+}
+
+// Taken from Nickolas Ent, https://github.com/NikolasEnt/PID-controller/blob/master/src/PID.cpp
+// For i_error calculation we sum up only WINDOW_SIZE measurements
+// inspired by code from https://stackoverflow.com/questions/25024012/running-sum-of-the-last-n-integers-in-an-array
+double PID::add_i(double err){
+  i = (i+1) % WINDOW_SIZE;
+  sum_cte = sum_cte - window[i] + err ;
+  return sum_cte;
 }
