@@ -170,12 +170,12 @@ int main() {
           #else // Approach #3
             throttle = 0.8;
             if (fabs(cte) > 0.5){
-		          thr = 0.5;
-		        }
+              throttle = 0.5;
+            }
             if (fabs(pid.prev_cte - cte) > 0.1 and fabs(pid.prev_cte - cte) <= 0.2){
               throttle = 0.0;
-		        } else if (fabs(pid.prev_cte - cte) > 0.2 and speed > 30){
-			        throttle = -0.2; // Break!
+            } else if (fabs(pid.prev_cte - cte) > 0.2 and speed > 30){
+              throttle = -0.2; // Break!
             }
           #endif
 

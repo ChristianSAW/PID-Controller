@@ -1,5 +1,9 @@
+#include <stdlib.h>
 #include "PID.h"
+
 #define WINDOW_SIZE 20
+
+using namespace std;
 
 /**
  * TODO: Complete the PID class. You may add any additional desired functions.
@@ -21,8 +25,8 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   stp = 0;
 
   // For 3rd PID Approach (Use of Sliding Window for cte sum)
-  window = (int*) calloc( WINDOW_SIZE , sizeof(window[0]) ) ;
-  i = WINDOW_SIZE - 1 ;
+  window = (int*) calloc( WINDOW_SIZE , sizeof(window[0]) );
+  i = WINDOW_SIZE - 1;
 }
 
 void PID::UpdateError(double cte) {
@@ -38,7 +42,7 @@ void PID::UpdateError(double cte) {
 
 void PID::UpdateError2(double cte, double dt) {
   p_error = -cte;
-  d_error = -(cte-prev_cte);
+  d_error = -(cte-prev_cte)/dt;
   i_error = -add_i(cte * dt);
   prev_cte = cte;
 }
@@ -56,12 +60,12 @@ double PID::update_val(double cte) {
   return TotalError();
 }
 
-double PID::update_steering_lin(double cte, double speed, dt) {
+double PID::update_steering_lin(double cte, double speed, double dt) {
   double Kp_sp = 0.0032;
   double Kd_sp = 0.0002;
   ++stp;
   UpdateError2(cte,dt);
-  return (Kp - Kp_sp*speed)*p_error + (Kd + Kd_sp*speed)*d_error + Ki*i_error
+  return (Kp - Kp_sp*speed)*p_error + (Kd + Kd_sp*speed)*d_error + Ki*i_error;
 }
 
 int PID::get_stp() {

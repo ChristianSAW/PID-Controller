@@ -24,6 +24,13 @@ class PID {
    * @param cte The current cross track error
    */
   void UpdateError(double cte);
+  
+   /**
+   * Update the PID error variables given cross track error and dt.
+   * @param cte The current cross track error
+   * @param dt The current time delta for this time stamp 
+   */
+  void UpdateError2(double cte, double dt);
 
   /**
    * Calculate the total PID error.
@@ -37,7 +44,14 @@ class PID {
    */
   double update_val(double cte);
 
-
+  /**
+   * Update the steering value given cte, speed, and dt.
+   * @param cte The current cross track error
+   * @param speed The current speed of the car
+   * @param dt The current time delta for this time stamp 
+   */
+  double update_steering_lin(double cte, double speed, double dt);
+  
   /**
    * Returns the current step (counter)
    */
@@ -45,6 +59,7 @@ class PID {
 
   /**
    * Returns sliding window addition of err
+   * @param err Error to be cumulatively added
    */
   double add_i(double err);
 
