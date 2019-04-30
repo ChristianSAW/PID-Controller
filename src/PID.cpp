@@ -62,7 +62,7 @@ double PID::update_val(double cte) {
 
 double PID::update_steering_lin(double cte, double speed, double dt) {
   double Kp_sp = 0.0032;
-  double Kd_sp = 0.0002;
+  double Kd_sp = 0.0007;
   ++stp;
   UpdateError2(cte,dt);
   return (Kp - Kp_sp*speed)*p_error + (Kd + Kd_sp*speed)*d_error + Ki*i_error;
