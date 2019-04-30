@@ -56,10 +56,10 @@ ax1.set_ylabel('CTE')
 ax1.set_title('CTE vs Steering Angle vs Vehicle Angle vs Time Step')
 
 ax2.plot(y_steer)
-ax2.set_ylabel('Steering Value [Rads]')
+ax2.set_ylabel('Steering Value')
 
 ax3.plot(y_angle)
-ax3.set_ylabel('Angle [Rads]')
+ax3.set_ylabel('Angle')
 ax3.set_xlabel('Time Step')
 
 f1.tight_layout()

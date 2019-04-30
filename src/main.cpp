@@ -48,21 +48,25 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
+  //  PID - Steering Value
   double init_Kp = 0.225;
   double init_Kd = 4.05;
   double init_Ki = 0.0005;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
+  // PID - Throttle, Error = Delta Speed
   double init_Kp_t1 = 0.25;
   double init_Kd_t1 = -2.0; // try a negative value
   double init_Ki_t1 = 0.0;
   pid_t_speed.Init(init_Kp_t1,init_Ki_t1,init_Kd_t1);
 
+  // PID - Throttle, Error = CTE
   double init_Kp_t2 = 2;
   double init_Kd_t2 = 20.0; // try 2 or 20
   double init_Ki_t2 = 0.0005;
   pid_t_cte.Init(init_Kp_t2,init_Ki_t2,init_Kd_t2);
 
+  // PID - Throttle, Error = Steering Value
   double init_Kp_t3 = 4.0;
   double init_Kd_t3 = 40.0; // try 4 or 40
   double init_Ki_t3 = 0.0;
@@ -94,6 +98,8 @@ int main() {
           double throttle;
           double desired_speed = 70;
           double error_speed = desired_speed - speed;
+          double error_cte;
+          double error_steering;
           vector<double> data1;
           /**
            * TODO: Calculate steering value here, remember the steering value is
@@ -131,6 +137,16 @@ int main() {
           }
           #endif
 
+          // Piecewise limits on error_cte & error_steering
+          double limBand1 = 0.2
+          double limBand2 = 0.25
+          if (fabs(cte) < limBand1) {error_cte = 0;}
+           else {error_cte = cte;}
+          if (fabs(steer_value) < limBand2) {error_steering = 0;}
+          else {error_steering = steer_value;}
+
+
+
           // calculate throttle
           throttle = -pid_t_speed.update_val(error_speed)
                      +pid_t_cte.update_val(cte)
@@ -146,7 +162,7 @@ int main() {
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value
                     << std::endl;
-          
+
           if (speed > msp) {
             msp = speed;
           }
