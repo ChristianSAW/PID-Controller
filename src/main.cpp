@@ -53,25 +53,26 @@ int main() {
   double init_Ki = 0.0005;
   pid.Init(init_Kp,init_Ki,init_Kd);
 
-  double init_Kp_t1 = 0.2;
-  double init_Kd_t1 = 0.0; // try a negative value
+  double init_Kp_t1 = 0.25;
+  double init_Kd_t1 = -2.0; // try a negative value
   double init_Ki_t1 = 0.0;
   pid_t_speed.Init(init_Kp_t1,init_Ki_t1,init_Kd_t1);
 
-  double init_Kp_t2 = 2.0;
-  double init_Kd_t2 = 0.0; // try 2 or 20
-  double init_Ki_t2 = 0.0;
+  double init_Kp_t2 = 2;
+  double init_Kd_t2 = 20.0; // try 2 or 20
+  double init_Ki_t2 = 0.0005;
   pid_t_cte.Init(init_Kp_t2,init_Ki_t2,init_Kd_t2);
 
-  double init_Kp_t3 = 2.0;
-  double init_Kd_t3 = 0.0; // try 4 or 40
+  double init_Kp_t3 = 4.0;
+  double init_Kd_t3 = 40.0; // try 4 or 40
   double init_Ki_t3 = 0.0;
   pid_t_steer.Init(init_Kp_t3,init_Ki_t3,init_Kd_t3);
 
   double alpha = 0.99;
+  double msp = 0;         // max speed
   filter_steer.Init(alpha);
 
-  h.onMessage([&pid,&pid_t_cte,&pid_t_speed,&pid_t_steer, &filter_steer, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&pid,&pid_t_cte,&pid_t_speed,&pid_t_steer, &filter_steer, &msp, path1](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -131,7 +132,9 @@ int main() {
           #endif
 
           // calculate throttle
-          throttle = -pid.update_val(error_speed);
+          throttle = -pid_t_speed.update_val(error_speed)
+                     +pid_t_cte.update_val(cte)
+                     +pid_t_steer.update_val(fabs(steer_value));
 
           // Keep Steering Value Within Bounds
           if (steer_value < -1) {
@@ -143,6 +146,11 @@ int main() {
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value
                     << std::endl;
+          
+          if (speed > msp) {
+            msp = speed;
+          }
+          std::cout << "Max Speed: " << msp << " mph : Current Speed: " << speed << " mph"<<std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
