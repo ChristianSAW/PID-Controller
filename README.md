@@ -3,6 +3,12 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+[//]: # (Image References)
+
+[image1]: Figures/approach_1_Figure_1.png "Approach 1 CTE vs Time"
+[image2]: Figures/approach_1_Figure_2.png "Approach 1 CTE vs Steering Value vs Angle vs Time"
+[image3]: Figures/approach_1_Figure_3.png "Approach 1 CTE vs Throttle vs Speed vs Time"
+
 ## Approach and Results
 In this project I implement a PID controller to drive a car around a race track.
 The simplest way to complete this objective was to us a single PID controller for
@@ -14,7 +20,7 @@ driving speed while still maintaining stability.
 ### Simple & Safe PID (Approach #1)
 At low speeds (~25-30 mph), a simple PID controller on the steering value of the
 sufficiently keeps the vehicle in check. The final setup was as such:
-Steering Value = -K_p*CTE - K_d(CTE - CTE_Prev) - K_i(cumulative_sum(CTE)).
+Steering Value = -K_p*CTE - K_d*(CTE - CTE_Prev) - K_i*(cumulative_sum(CTE)).
 
 #### Effect of P:
 The proportional term, K_p drives the error term, CTE to zero. It accounts only for
@@ -33,19 +39,40 @@ The integral terms, K_i helps account for the systematic bias due to calibration
 or hardware or modeling) by adjusting the value which the error term oscillates
 about. The integral control accounts for the cumulative sum of the error.
 
-#### Tuning Hyper Parameters
-I initially guessed the hyper parameters based off the ones used in the lesson.
+#### Tuning Hyperparameters
+I initially guessed the hyperparameters based off the ones used in the lesson.
 Initial Guess: [K_p,K_d,K_i] = [0.12,4.3,0.002]. Rather than using twiddle, I was
 able to manually tune these through trial and error until I got a satisfactory result.
-* While tuning, I found that using a large P value e.g. 0.5 resulted in significant
+* **Tuning K_p:** I found that using a large K_p value e.g. 0.5 resulted in significant
 overshoot that could not be overcome by the derivative control. Essentially, a large
-P value made the controller incredibly sensitive to error and the car would never
-recover from beginning oscillate and end outside the track. A P value that was too small
+P_p value made the controller incredibly sensitive to error and the car would never
+recover from beginning oscillate and end outside the track. A K_p value that was too small
 e.g. 0.01 would result in a controller that could not correct itself in time and
 the car would go off the track at the first turn.
-* 
+* **Tuning K_d:** Tuning K_d went hand-in hand with K_p, K_d had to balance the overshoot
+without being to large. A large K_d value such as 10 would effectively drive the car off
+the track as the controller counter steers the car too much. And, as mentioned before,
+a K_d value too small such as 1.0 would not be able to combat overshoot.
+* **Tuning K_i:** A large K_i value such as 0.1 would result in the vehicle simply
+driving off the track because the bias is being over accounted for. A too small value
+such as 0.00005 would no correct the offset and lead the car to be off center. In situations
+of high speed and oscillations, this can be enough to cause the car to exit the road.
+
+After manual tuning, I settled on these values:
+[K_p,K_d,K_i] = [0.225,4.05,0.0005]
+
+A graph of the CTE, Throttle, and Speed vs Time can be seen below.
+
+![alt text][image2]
+
+This following video shows the PID in action
+
+[![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/VPekjcBFmn4/hqdefault.jpg)](https://youtu.be/VPekjcBFmn4)
 
 ### PID of Steering Value & Throttle (Approach #2)
+To increase the speed of the car, I needed to increase my throttle correctly. The issue
+here, however is that if the car is too fast, the steering control will fail, so the throttle
+control must take into account the steering.  
 
 ### Linearized Steering Value PID (Approach #3)
 
