@@ -3,6 +3,53 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+## Approach and Results
+In this project I implement a PID controller to drive a car around a race track.
+The simplest way to complete this objective was to us a single PID controller for
+the steering value input to the car. The error for this PID was Cross Track Error
+(CTE). To satisfy the criteria of the vehicle not leaving the track, Approach 1
+works well. I considered 2 additional approaches to attempt to increase the possible
+driving speed while still maintaining stability.
+
+### Simple & Safe PID (Approach #1)
+At low speeds (~25-30 mph), a simple PID controller on the steering value of the
+sufficiently keeps the vehicle in check. The final setup was as such:
+Steering Value = -K_p*CTE - K_d(CTE - CTE_Prev) - K_i(cumulative_sum(CTE)).
+
+#### Effect of P:
+The proportional term, K_p drives the error term, CTE to zero. It accounts only for
+the current value of the error. The larger the value,the faster the error is driven down.
+The consequence of this is that large P values will make the error oscillate about a set point.
+To account for this, we add a derivative term.
+
+#### Effect of D
+The derivative term, K_d helps overcome the overshoot caused by the proportional
+control by accounting for the change in direction and rate of error. The derivative
+control considers the current error and the previous error, or rather the change
+between the two.
+
+#### Effect of I
+The integral terms, K_i helps account for the systematic bias due to calibration
+or hardware or modeling) by adjusting the value which the error term oscillates
+about. The integral control accounts for the cumulative sum of the error.
+
+#### Tuning Hyper Parameters
+I initially guessed the hyper parameters based off the ones used in the lesson.
+Initial Guess: [K_p,K_d,K_i] = [0.12,4.3,0.002]. Rather than using twiddle, I was
+able to manually tune these through trial and error until I got a satisfactory result.
+* While tuning, I found that using a large P value e.g. 0.5 resulted in significant
+overshoot that could not be overcome by the derivative control. Essentially, a large
+P value made the controller incredibly sensitive to error and the car would never
+recover from beginning oscillate and end outside the track. A P value that was too small
+e.g. 0.01 would result in a controller that could not correct itself in time and
+the car would go off the track at the first turn.
+* 
+
+### PID of Steering Value & Throttle (Approach #2)
+
+### Linearized Steering Value PID (Approach #3)
+
+
 ## Dependencies
 
 * cmake >= 3.5
@@ -19,7 +66,7 @@ Self-Driving Car Engineer Nanodegree Program
   * Run either `./install-mac.sh` or `./install-ubuntu.sh`.
   * If you install from source, checkout to commit `e94b6e1`, i.e.
     ```
-    git clone https://github.com/uWebSockets/uWebSockets 
+    git clone https://github.com/uWebSockets/uWebSockets
     cd uWebSockets
     git checkout e94b6e1
     ```
@@ -33,7 +80,7 @@ Fellow students have put together a guide to Windows set-up for the project [her
 1. Clone this repo.
 2. Make a build directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
-4. Run it: `./pid`. 
+4. Run it: `./pid`.
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
@@ -95,4 +142,3 @@ still be compilable with cmake and make./
 
 ## How to write a README
 A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
