@@ -136,7 +136,7 @@ A graph of the CTE, Steering Value, and Steering Angle vs Time can be seen below
 
 The following video shows the PID of Approach 2 in action.
 
-[![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/0ahAKrdoMZI/maxresdefault.jpg)](https://youtu.be/0ahAKrdoMZI)
+[![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/0ahAKrdoMZI/hqdefault.jpg)](https://youtu.be/0ahAKrdoMZI)
 
 ### Linearized Steering Value PID (Approach #3)
 
