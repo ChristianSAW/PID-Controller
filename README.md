@@ -100,7 +100,7 @@ traveled between each correction to speed and throttle will vary depending on th
 * Third PID controller was to reduce the throttle during high steering values so the car had time to correct itself.
 After manual tuning, the final values were [K_p,3; K_d,3] = [4.0; 40.0].
 
-**The Difficult Part**
+**The Difficult Part** <br>
 The crux of the problem here is determining the appropriate relationship between
 steering value and throttle when designing the controllers because these two values
 affect each other when attempting to minimize CTE and E_speed. To minimize the CTE
@@ -124,13 +124,13 @@ Note that the steering value parameters were slightly changed for this approach,
 
 The maximum speed achieved here while the vehicle was stable was 61.5 mph. During this run,
 the vehicle stays on the track but it wobbles quite a bit and will cross the lane lines
-at certain points. The average speed here is lower between 40-45 mph.
+at certain points. The average speed here is lower (~40-45 mph).
 
 A graph of the CTE, Throttle, and Speed vs Time can be seen below.
 
 ![alt text][image5]
 
-A graph of the CTE, Steering Value, Steering Angle vs Time can be seen below.
+A graph of the CTE, Steering Value, and Steering Angle vs Time can be seen below.
 
 ![alt text][image6]
 
