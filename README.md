@@ -8,6 +8,9 @@ Self-Driving Car Engineer Nanodegree Program
 [image1]: Figures/approach_1_Figure_1.png "Approach 1 CTE vs Time"
 [image2]: Figures/approach_1_Figure_2.png "Approach 1 CTE vs Steering Value vs Angle vs Time"
 [image3]: Figures/approach_1_Figure_3.png "Approach 1 CTE vs Throttle vs Speed vs Time"
+[image4]: Figures/approach_2_Figure_1.png "Approach 2 CTE vs Time"
+[image5]: Figures/approach_3_Figure_2.png "Approach 2 CTE vs Steering Value vs Angle vs Time"
+[image6]: Figures/approach_4_Figure_3.png "Approach 2 CTE vs Throttle vs Speed vs Time"
 
 ## Approach and Results
 In this project I implement a PID controller to drive a car around a race track.
@@ -20,7 +23,7 @@ driving speed while still maintaining stability.
 ### Simple & Safe PID (Approach #1)
 At low speeds (~25-30 mph), a simple PID controller on the steering value of the
 sufficiently keeps the vehicle in check. The final setup was as such:
-Steering Value = -K_p*CTE - K_d*(CTE - CTE_Prev) - K_i*(cumulative_sum(CTE)).
+Steering Value = -K_p\**\*(CTE) - K_d\**\*(CTE - CTE_Prev) - K_i\**\*(cumulative_sum(CTE)).
 
 #### Effect of P:
 The proportional term, K_p drives the error term, CTE to zero. It accounts only for
@@ -65,14 +68,72 @@ A graph of the CTE, Throttle, and Speed vs Time can be seen below.
 
 ![alt text][image2]
 
-This following video shows the PID in action
+The following video shows the PID in action.
 
 [![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/VPekjcBFmn4/hqdefault.jpg)](https://youtu.be/VPekjcBFmn4)
 
 ### PID of Steering Value & Throttle (Approach #2)
 To increase the speed of the car, I needed to increase my throttle correctly. The issue
 here, however is that if the car is too fast, the steering control will fail, so the throttle
-control must take into account the steering.  
+control must take into account the steering.
+
+In this approach, I kept the PID on steering relatively the same and I combined 3 different PID controllers
+to control throttle.
+
+PID_1 = K_p,1\**\*(E_speed) - K_d,1\**\*(E_speed - E_speed_Prev)
+PID_2 = -K_p,2\**\*(CTE) - K_d,2\**\*(CTE - CTE_Prev) - K_i,2\**\*(cumulative_sum(CTE))
+PID_3 = -K_p,3\**\*(SV) - K_d,2\**\*(SV - SV_Prev)
+Throttle = PID_1 + PID_2 + PID_3
+*Note, SV = Steering Value, E_speed = Desired Speed - Actual Speed*
+
+* The First PID controller was to simply to get the car to a certain speed. The proportional term
+does this while the derivative term acts as a damper on the rate of throttle change. After manual tuning,
+the values used were, [K_p,1; K_d,1] = [0.25; 2.0].
+
+* The Second PID controller was to include the impact of CTE on throttle. Effectively, the terms here were used to
+make the throttle take into account CTE in the same manner as the steering did. After manual tuning, the values used
+were, [K_p,2; K_d,2; K_i,2] = [2.0; 20.0; 0.0005]. This is important as different speeds will affect CTE since the distance
+traveled between each correction to speed and throttle will vary depending on the speed.
+
+* Third PID controller was to reduce the throttle during high steering values so the car had time to correct itself.
+After manual tuning, the final values were [K_p,3; K_d,3] = [4.0; 40.0].
+
+**The Difficult Part**
+The crux of the problem here is determining the appropriate relationship between
+steering value and throttle when designing the controllers because these two values
+affect each other when attempting to minimize CTE and E_speed. To minimize the CTE
+and distance between your actual speed and desired speed, one must determine the
+best way to make speed dependent on throttle and/or vice versa.
+
+In this approach, steering was left as the independent variable with throttle being
+the dependent. However, with the number of hyperparameters, it was difficult to tune the
+controllers. While I did not use an optimizer here, to tune these properly, I would recommend
+using one such as twiddle. To see twiddle implemented well, see either,
+1. Jeremy Shannon's use of twiddle. Here, he updates the parameters after each lap completion
+of the simulation. Be aware this results in him running the simulation for quite a while. He notes
+that he let the car run for 500 laps to optimize the parameters he uses.
+Link: https://github.com/jeremy-shannon/CarND-PID-Control-Project
+2. Vivek Yadav's use of twiddle. Vivek updates parameters after an arbitrary number of
+steps. Link: https://github.com/vxy10/P4T2SCND_PIDControl
+
+Note that the steering value parameters were slightly changed for this approach,
+[K_p,K_d,K_i] = [0.15,4.05,0.0005].
+
+The maximum speed achieved here while the vehicle was stable was 61.5 mph. During this run,
+the vehicle stays on the track but it wobbles quite a bit and will cross the lane lines
+at certain points. The average speed here is lower between 40-45 mph.
+
+A graph of the CTE, Throttle, and Speed vs Time can be seen below.
+
+![alt text][image5]
+
+A graph of the CTE, Steering Value, Steering Angle vs Tme can be seen below.
+
+![alt text][image6]
+
+The following video shows the PID of Apporach 2 in action.
+
+[![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/0ahAKrdoMZI/maxresdefault.jpg)](https://youtu.be/0ahAKrdoMZI )
 
 ### Linearized Steering Value PID (Approach #3)
 

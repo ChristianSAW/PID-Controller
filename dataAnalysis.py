@@ -13,12 +13,12 @@ class DataLog:
 
 fName0 = "output_files/datalog_1.txt"
 fName1 = "output_files/datalog_1_Simple_PID.txt" # Approach #1
-fName2 = "output_files/datalog_1_run_ll.txt"     # Approach #2
-fName3 = "output_files/datalog_1_run_zz.txt"     # Approach #3
+fName2 = "output_files/datalog_1_ll.txt"     # Approach #2
+fName3 = "output_files/datalog_1_zz.txt"     # Approach #3
 
 # populate structure
 dl1 = DataLog()
-with open(fName1, "r") as f:
+with open(fName2, "r") as f:
     for line in f:
         row = line.split(" ")
         # populate datalog dl1
