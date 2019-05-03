@@ -70,7 +70,7 @@ After manual tuning, I settled on these values:
 
 A graph of the CTE, Throttle, and Speed vs Time can be seen below.
 
-![alt text][image2]
+![alt text][image3]
 
 The following video shows the PID in action.
 
@@ -131,11 +131,11 @@ at certain points. The average speed here is lower (~40-45 mph).
 
 A graph of the CTE, Throttle, and Speed vs Time can be seen below.
 
-![alt text][image5]
+![alt text][image6]
 
 A graph of the CTE, Steering Value, and Steering Angle vs Time can be seen below.
 
-![alt text][image6]
+![alt text][image5]
 
 The following video shows the PID of Approach 2 in action.
 
@@ -175,18 +175,18 @@ with twiddle.
 
 A graph of the CTE, Throttle, and Speed vs Time can be seen below.
 
-![alt text][image8]
+![alt text][image9]
 
 A graph of the CTE, Steering Value, and Steering Angle vs Time can be seen below.
 
-![alt text][image9]
+![alt text][image8]
 
 The following video shows the PID of Approach 3 in action.
 
 [![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/csDpburpuNo/hqdefault.jpg)](https://youtu.be/csDpburpuNo)
 
 The conclusion here is that the safest ride is still approach 1. With optimal tuning,
-both approach 2 and 3 could likely be safe viable options. 
+both approach 2 and 3 could likely be safe viable options.
 
 ## Dependencies
 
