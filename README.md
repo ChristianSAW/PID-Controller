@@ -11,6 +11,9 @@ Self-Driving Car Engineer Nanodegree Program
 [image4]: Figures/approach_2_Figure_1.png "Approach 2 CTE vs Time"
 [image5]: Figures/approach_2_Figure_2.png "Approach 2 CTE vs Steering Value vs Angle vs Time"
 [image6]: Figures/approach_2_Figure_3.png "Approach 2 CTE vs Throttle vs Speed vs Time"
+[image7]: Figures/approach_3_Figure_1.png "Approach 3 CTE vs Time"
+[image8]: Figures/approach_3_Figure_2.png "Approach 3 CTE vs Steering Value vs Angle vs Time"
+[image9]: Figures/approach_3_Figure_3.png "Approach 3 CTE vs Throttle vs Speed vs Time"
 
 ## Approach and Results
 In this project I implement a PID controller to drive a car around a race track.
@@ -139,7 +142,51 @@ The following video shows the PID of Approach 2 in action.
 [![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/0ahAKrdoMZI/hqdefault.jpg)](https://youtu.be/0ahAKrdoMZI)
 
 ### Linearized Steering Value PID (Approach #3)
+In the previous attempt I set the dependent variable to be throttle. Here I set it
+to be the steering value. No PID controller for the throttle is used here, rather I set
+the throttle to a high value, 0.75 and change it if certain arbitrary conditions are met.
+Many of these conditions were determined by during the tuning of the steering controller
+parameters.
 
+The steering control is as such,
+
+```
+Steering_Value = -(K_p,1 - K_p,2*Speed)*CTE - (K_d,1 + K_d,2*speed)*(CTE - CTE_Prev)
+                 - K_i,1*(cumulative_sum(CTE))
+```
+
+Where [K_p,1; K_d,1; K_i,1] are the proportional, derivative, and integral terms from
+the simple PID controller, and [K_p,2; K_d,2] are the proportional and derivative terms
+for the impact of throttle on steering. The idea here is that at any speed, there are ideal
+tuned parameters for the simple PID controller. So to get this controller to work for
+any speed, we linearize the controller as such.
+
+*Note: This entire approach is based off the methodology used by Nikolay Falaleev.
+Source to his project: https://github.com/NikolasEnt/PID-controller*
+
+I manually tuned the parameters through trial and error. The final values were as
+follows,
+* [K_p,1; K_d,1; K_i,1] = [0.25; 1.35; 0.005]
+* [K_p,2; K_d,2] = [0.0032; 0.0007]
+
+The top speed reached here was ~75 mph. Like approach 2, the car swerves quite a bit.
+As was the case with the second approach, optimal tuning could be done by optimizing
+with twiddle.
+
+A graph of the CTE, Throttle, and Speed vs Time can be seen below.
+
+![alt text][image8]
+
+A graph of the CTE, Steering Value, and Steering Angle vs Time can be seen below.
+
+![alt text][image9]
+
+The following video shows the PID of Approach 3 in action.
+
+[![IMAGE ALT TEXT HERE](http://i3.ytimg.com/vi/csDpburpuNo/hqdefault.jpg)](https://youtu.be/csDpburpuNo)
+
+The conclusion here is that the safest ride is still approach 1. With optimal tuning,
+both approach 2 and 3 could likely be safe viable options. 
 
 ## Dependencies
 

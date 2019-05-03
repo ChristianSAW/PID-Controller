@@ -18,7 +18,7 @@ fName3 = "output_files/datalog_1_zz.txt"     # Approach #3
 
 # populate structure
 dl1 = DataLog()
-with open(fName2, "r") as f:
+with open(fName3, "r") as f:
     for line in f:
         row = line.split(" ")
         # populate datalog dl1
