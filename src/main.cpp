@@ -49,9 +49,9 @@ int main() {
    * TODO: Initialize the pid variable.
    */
   //  PID - Steering Value
-  double init_Kp = 0.25; //0.15
-  double init_Kd = 1.35; //4.05
-  double init_Ki = 0.005; //0.0005
+  double init_Kp = 0.225;   // [A1: 0.225],  [A2: 0.15],    [A3: 0.25]
+  double init_Kd = 4.05;    // [A1: 4.05],   [A2: 4.05],    [A3: 1.35]
+  double init_Ki = 0.0005;  // [A1: 0.0005], [A2: 0.0005],  [A3:0.005]
   pid.Init(init_Kp,init_Ki,init_Kd);
 
   // PID - Throttle, Error = Delta Speed
@@ -116,7 +116,7 @@ int main() {
            */
 
           // data logging
-          #if(true)
+          #if(false)
             if ((pid.get_stp()+0)%2 == 0) {
               data1 = {speed, throttle, steer_value, angle, cte};
               std::ofstream outfile;
@@ -127,7 +127,7 @@ int main() {
           #endif
 
           // calculate steering
-          #if(false) // Approach #1 & #2
+          #if(true) // Approach #1 & #2
             steer_value = pid.update_val(cte);
             steer_value = filter_steer.smooth(steer_value);       // smooth out changes
           #else // Approach #3
@@ -138,7 +138,7 @@ int main() {
 
           // throttle update Simple PID
           //throttle = 0.3;
-          #if(false) // Approach #1
+          #if(true) // Approach #1
             if (speed > 30) {                 // speed > 30
               throttle = 0.3;
             } else {                          // speed < 30
@@ -167,7 +167,7 @@ int main() {
             throttle = -pid_t_speed.update_val(error_speed)
                       +pid_t_cte.update_val(error_cte)
                       +pid_t_steer.update_val(fabs(error_steering));
-          #else // Approach #3
+          #elseif(false) // Approach #3
             throttle = 0.75;
             if (fabs(cte) > 0.5){
               throttle = 0.5;
